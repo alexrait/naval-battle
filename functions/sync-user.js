@@ -15,15 +15,24 @@ export const handler = async (event) => {
     }
 
     // Upsert user into the users table
-    await sql`
-      INSERT INTO navalbattle.users (id, email, name, last_played)
-      VALUES (${id}, ${email}, ${name || 'Unknown Soldier'}, CURRENT_TIMESTAMP)
-      ON CONFLICT (id) 
-      DO UPDATE SET 
-        last_played = CURRENT_TIMESTAMP,
-        email = EXCLUDED.email,
-        name = EXCLUDED.name
-    `;
+    try {
+      await sql`
+        INSERT INTO navalbattle.users (id, email, name, last_played)
+        VALUES (${id}, ${email}, ${name || 'Unknown Soldier'}, CURRENT_TIMESTAMP)
+        ON CONFLICT (id) 
+        DO UPDATE SET 
+          last_played = CURRENT_TIMESTAMP,
+          email = EXCLUDED.email,
+          name = EXCLUDED.name
+      `;
+    } catch (dbError) {
+      console.error("Database query failed:", dbError);
+      return {
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Database operation failed", details: dbError.message }),
+      };
+    }
 
     return {
       statusCode: 200,
