@@ -21,36 +21,28 @@ body {
 }
 
 .ocean-bg {
-  background: #020617;
+  background: #f8fafc;
   background-image: 
-    radial-gradient(circle at 50% -20%, #1e3a8a 0%, transparent 60%),
-    linear-gradient(rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.8)),
-    url("https://images.unsplash.com/photo-1500043356167-97d89656d0b1?auto=format&fit=crop&q=80&w=2000");
+    radial-gradient(circle at 50% 50%, rgba(186, 230, 253, 0.4) 0%, transparent 70%),
+    linear-gradient(rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)),
+    url("https://images.unsplash.com/photo-1505118380757-91f5f45d8de4?auto=format&fit=crop&q=80&w=2000");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   min-height: 100vh;
 }
 
+.command-card {
+  background: #1d4ed8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(29, 78, 216, 0.3);
+}
+
 .tactical-grid {
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(30, 64, 175, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 64, 175, 0.05) 1px, transparent 1px);
   background-size: 20px 20px;
-}
-
-.glass-morphism {
-  background: rgba(15, 23, 42, 0.3);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-.command-card {
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.4) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .tactical-font {
