@@ -2,13 +2,18 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Grid } from "./Grid";
 import { useLanguage } from "../context/LanguageContext";
 import { SOUNDS } from "../lib/constants";
+import { cn } from "../lib/utils";
+import Pusher from "pusher-js";
 
-export const GameBoard = ({ initialShips }) => {
+const PUSHER_KEY = import.meta.env.VITE_PUSHER_KEY;
+const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_CLUSTER;
+
+export const GameBoard = ({ initialShips, gameId }) => {
   const { t } = useLanguage();
   const [playerShips] = useState(initialShips || []);
   const [opponentCells, setOpponentCells] = useState([]);
   const [playerCells, setPlayerCells] = useState([]);
-  const [turn, setTurn] = useState("player");
+  const [turn, setTurn] = useState("player"); // We can refine this based on who invited whom
   const [winner, setWinner] = useState(null);
 
   const playSound = (type) => {
@@ -16,41 +21,63 @@ export const GameBoard = ({ initialShips }) => {
     audio.play().catch(e => console.log("Sound error:", e));
   };
 
-  const handleFire = useCallback((x, y) => {
-    if (turn !== "player" || winner) return;
+  useEffect(() => {
+    if (!gameId) return;
 
-    const isHit = Math.random() > 0.8; 
-    const status = isHit ? "hit" : "miss";
+    const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+    const channel = pusher.subscribe(`game-${gameId}`);
 
-    setOpponentCells(prev => {
-      const newCells = [...prev, { x, y, status }];
-      const totalHits = newCells.filter(c => c.status === "hit").length;
-      if (totalHits === 26) setWinner("player");
-      return newCells;
+    channel.bind("fire", (data) => {
+      if (data.senderId !== window.netlifyIdentity.currentUser()?.id) {
+        handleIncomingFire(data.x, data.y);
+      }
     });
 
-    if (isHit) playSound("HIT");
-    else playSound("MISS");
+    channel.bind("fire-result", (data) => {
+      if (data.senderId !== window.netlifyIdentity.currentUser()?.id) {
+        handleFireResult(data.x, data.y, data.status);
+      }
+    });
+
+    return () => {
+      pusher.unsubscribe(`game-${gameId}`);
+      pusher.disconnect();
+    };
+  }, [gameId, playerShips]);
+
+  const handleIncomingFire = async (x, y) => {
+    const isHit = playerShips.some(s => s.cells.some(c => c.x === x && c.y === y));
+    const status = isHit ? "hit" : "miss";
+    
+    setPlayerCells(prev => [...prev, { x, y, status }]);
+    playSound(isHit ? "HIT" : "MISS");
+
+    await fetch("/.netlify/functions/report-result", {
+      method: "POST",
+      body: JSON.stringify({ gameId, x, y, status })
+    });
+    
+    setTurn("player");
+  };
+
+  const handleFireResult = (x, y, status) => {
+    setOpponentCells(prev => {
+      const newCells = [...prev, { x, y, status }];
+      if (newCells.filter(c => c.status === "hit").length === 26) setWinner("player");
+      return newCells;
+    });
+    playSound(status === "hit" ? "HIT" : "MISS");
+  };
+
+  const handleFire = async (x, y) => {
+    if (turn !== "player" || winner) return;
 
     setTurn("opponent");
-    
-    setTimeout(() => {
-      const aiX = Math.floor(Math.random() * 10);
-      const aiY = Math.floor(Math.random() * 10);
-      const aiHit = playerShips.some(s => s.cells.some(c => c.x === aiX && c.y === aiY));
-      
-      setPlayerCells(prev => {
-        const newCells = [...prev, { x: aiX, y: aiY, status: aiHit ? "hit" : "miss" }];
-        const totalAiHits = newCells.filter(c => c.status === "hit").length;
-        if (totalAiHits === 26) setWinner("opponent");
-        return newCells;
-      });
-
-      if (aiHit) playSound("HIT");
-      else playSound("MISS");
-      setTurn("player");
-    }, 1000);
-  }, [turn, winner, playerShips]);
+    await fetch("/.netlify/functions/fire", {
+      method: "POST",
+      body: JSON.stringify({ gameId, x, y })
+    });
+  };
 
   return (
     <div className="flex flex-col items-center gap-12 w-full max-w-7xl animate-in fade-in zoom-in-95 duration-700 pb-20">
@@ -69,7 +96,6 @@ export const GameBoard = ({ initialShips }) => {
       </div>
 
       <div className="flex flex-col xl:flex-row gap-20 items-center justify-center w-full">
-        {/* Player Board */}
         <div className="flex flex-col items-center gap-6 group">
           <div className="bg-blue-600/80 px-6 py-2 rounded-t-lg border-x border-t border-white/20 transform translate-y-1">
             <span className="text-lg font-bold text-white uppercase tracking-[0.2em] marker-font">{t("yourFleet")}</span>
@@ -83,10 +109,8 @@ export const GameBoard = ({ initialShips }) => {
           />
         </div>
 
-        {/* Vertical Divider for XL screens */}
         <div className="hidden xl:block w-px h-96 bg-gradient-to-b from-transparent via-blue-500/20 to-transparent" />
 
-        {/* Opponent Board */}
         <div className="flex flex-col items-center gap-6 group">
           <div className="bg-red-600/80 px-6 py-2 rounded-t-lg border-x border-t border-white/20 transform translate-y-1">
             <span className="text-lg font-bold text-white uppercase tracking-[0.2em] marker-font">{t("opponentFleet")}</span>
@@ -100,8 +124,6 @@ export const GameBoard = ({ initialShips }) => {
           />
         </div>
       </div>
-
-      {/* Combat Log / Status could go here */}
     </div>
   );
 };

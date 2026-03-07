@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import { GameBoard } from "./components/GameBoard";
 import { Button } from "./components/ui/Button";

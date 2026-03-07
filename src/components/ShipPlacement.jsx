@@ -4,6 +4,7 @@ import { Button } from "./ui/Button";
 import { useLanguage } from "../context/LanguageContext";
 import { SHIPS_CONFIG, GRID_SIZE } from "../lib/constants";
 import { RotateCw, Shuffle, Play } from "lucide-react";
+import { cn } from "../lib/utils";
 
 export const ShipPlacement = ({ onComplete }) => {
   const { t } = useLanguage();
