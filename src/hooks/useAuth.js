@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import netlifyIdentity from "netlify-identity-widget";
-import "netlify-identity-widget/build/netlify-identity-widget.css";
 
 export const useAuth = () => {
   const [user, setUser] = useState(null);
