@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Grid } from "./Grid.jsx";
-import { Button } from "./ui/Button.jsx";
-import { useLanguage } from "../context/LanguageContext.jsx";
+import { Grid } from "./Grid";
+import { Button } from "./ui/Button";
+import { useLanguage } from "../context/LanguageContext";
 import { SHIPS_CONFIG, GRID_SIZE } from "../lib/constants";
 import { RotateCw, Shuffle, Play } from "lucide-react";
 
