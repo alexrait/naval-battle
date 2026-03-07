@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { LanguageProvider, useLanguage } from "./context/LanguageContext";
-import { GameBoard } from "./components/GameBoard";
-import { Button } from "./components/ui/Button";
-import { ShipPlacement } from "./components/ShipPlacement";
-import { useAuth } from "./hooks/useAuth";
+import { LanguageProvider, useLanguage } from "./context/LanguageContext.jsx";
+import { GameBoard } from "./components/GameBoard.jsx";
+import { Button } from "./components/ui/Button.jsx";
+import { ShipPlacement } from "./components/ShipPlacement.jsx";
+import { useAuth } from "./hooks/useAuth.js";
+import { useRealtime } from "./hooks/useRealtime.js";
 
 const GameContent = () => {
   const { t, lang, toggleLanguage } = useLanguage();

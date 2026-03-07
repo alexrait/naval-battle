@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Grid } from "./Grid";
-import { useLanguage } from "../context/LanguageContext";
+import { Grid } from "./Grid.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import { SOUNDS } from "../lib/constants";
 
 export const GameBoard = ({ initialShips }) => {
