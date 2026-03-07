@@ -1,75 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: 222 47% 11%;
-  --foreground: 213 31% 91%;
-  --primary: 217 91% 60%;
-  --muted: 215 25% 27%;
-  --accent: 210 40% 96%;
-}
-
 body {
-  background-color: #f0f8ff; /* Very light blue fallback */
-  color: #0f172a;
   font-family: "Inter", sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
   margin: 0;
-  overflow-x: hidden;
 }
 
-.ocean-bg {
-  background: #f0f8ff;
-  background-image: 
-    linear-gradient(rgba(240, 248, 255, 0.85), rgba(240, 248, 255, 0.85)),
-    url("https://images.unsplash.com/photo-1505118380757-91f5f45d8de4?auto=format&fit=crop&q=80&w=2000");
+.login-bg {
+  background-image: url('https://images.unsplash.com/photo-1498092651296-641e88c3b057?auto=format&fit=crop&w=2000&q=80');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
-  min-height: 100vh;
 }
-
-.command-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.tactical-grid {
-  background-image: 
-    linear-gradient(rgba(30, 64, 175, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 64, 175, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-.tactical-font {
-  font-family: "JetBrains Mono", monospace;
-}
-
-.hit-marker {
-  animation: hit-pulse 0.5s ease-out;
-  background: radial-gradient(circle, #ef4444 0%, transparent 70%);
-}
-
-@keyframes hit-pulse {
-  0% { transform: scale(0.5); opacity: 0; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.fade-up {
-  animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.marker-font { font-family: "JetBrains Mono", monospace; }
-.architect-font { font-family: "Inter", sans-serif; }
 
 
 

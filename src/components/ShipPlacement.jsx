@@ -56,82 +56,77 @@ export const ShipPlacement = ({ onComplete }) => {
   const cells = placedShips.flatMap(s => s.cells.map(c => ({ ...c, shipId: s.id })));
 
   return (
-    <div className="flex flex-col items-center gap-12 max-w-5xl w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
-      <div className="text-center space-y-4">
-        <h2 className="text-5xl font-black text-blue-400 marker-font tracking-tight drop-shadow-lg">{t("placeShips")}</h2>
-        <p className="text-blue-200/60 text-lg max-w-md mx-auto Architects Daughter italic font-bold">
-          {lang === "he" ? "הצב את הצי שלך בעמדות קרב או תן למזל להחליט." : "Position your fleet for battle or let luck decide."}
+    <div className="flex flex-col items-center gap-8 w-full max-w-4xl animate-in fade-in zoom-in-95 duration-500">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tight">{t("placeShips")}</h2>
+        <p className="text-slate-500 text-sm mt-2">
+          {lang === "he" ? "הצב את הצי שלך על הלוח." : "Position your fleet on the board."}
         </p>
       </div>
       
-      <div className="flex flex-col lg:flex-row gap-16 items-center lg:items-start justify-center w-full">
-        <div className="relative group">
-          <div className="absolute -inset-4 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-          <Grid 
-            cells={cells} 
-            onCellClick={handleCellClick} 
-            showShips 
-            active={!!currentShip} 
-            rotation={-0.5}
-            className="shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative z-10"
-          />
-        </div>
+      <div className="flex flex-col lg:flex-row gap-8 items-start justify-center w-full">
+        <Grid 
+          cells={cells} 
+          onCellClick={handleCellClick} 
+          showShips 
+          active={!!currentShip} 
+        />
         
-        <div className="flex flex-col gap-6 bg-slate-900/60 p-8 rounded-3xl border border-white/10 backdrop-blur-xl w-80 shadow-2xl">
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+        <div className="flex flex-col gap-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-full lg:w-72">
+          <div className="flex justify-between items-center pb-4 border-b border-slate-100">
             <div className="flex flex-col">
-              <span className="text-xs text-blue-400 uppercase tracking-widest font-bold marker-font">{t("ships")}</span>
-              <span className="text-2xl font-black text-white marker-font">{placedShips.length} <span className="text-sm text-white/40">/ 13</span></span>
+              <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">{t("ships")}</span>
+              <span className="text-xl font-bold text-slate-900">{placedShips.length} <span className="text-sm text-slate-400 font-medium">/ 13</span></span>
             </div>
             <Button 
               size="icon" 
               variant="outline" 
-              className="rounded-full w-12 h-12 border-blue-500/50 hover:bg-blue-500/20"
               onClick={() => setOrientation(prev => prev === "horizontal" ? "vertical" : "horizontal")}
             >
-              <RotateCw className={cn("transition-transform duration-500", orientation === "vertical" ? "rotate-90" : "")} size={24} />
+              <RotateCw className={cn("transition-transform duration-300", orientation === "vertical" ? "rotate-90" : "")} size={18} />
             </Button>
           </div>
 
-          <div className="space-y-3 py-2">
+          <div className="space-y-2">
             {SHIPS_CONFIG.map(s => {
               const count = placedShips.filter(ps => ps.size === s.size).length;
               const isDone = count >= s.count;
               return (
                 <div key={s.name} className={cn(
-                  "flex items-center justify-between p-3 rounded-xl border transition-all duration-300",
-                  isDone ? "bg-green-500/10 border-green-500/30 opacity-50" : "bg-white/5 border-white/10"
+                  "flex items-center justify-between p-2 rounded-md transition-colors",
+                  isDone ? "bg-slate-50 text-slate-400" : "bg-white border border-slate-200"
                 )}>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white tracking-wide">{s.name}</span>
-                    <div className="flex gap-1 mt-1">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium">{s.name}</span>
+                    <div className="flex gap-1">
                       {Array.from({length: s.size}).map((_, i) => (
-                        <div key={i} className="w-3 h-2 bg-blue-400/40 rounded-full" />
+                        <div key={i} className={cn("w-2 h-2 rounded-sm", isDone ? "bg-slate-300" : "bg-blue-400")} />
                       ))}
                     </div>
                   </div>
-                  <span className="text-xs font-black marker-font text-blue-300">{count}/{s.count}</span>
+                  <span className="text-xs font-semibold">{count}/{s.count}</span>
                 </div>
               );
             })}
           </div>
 
           <div className="pt-4 flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" size="sm" onClick={randomize} className="flex gap-2 rounded-xl py-6 border-white/20 hover:bg-white/10">
-                <Shuffle size={16} /> {t("randomize")}
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={randomize} className="flex gap-2">
+                <Shuffle size={14} /> {t("randomize")}
               </Button>
-              <Button variant="outline" size="sm" onClick={reset} className="flex gap-2 rounded-xl py-6 border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300">
+              <Button variant="outline" size="sm" onClick={reset} className="flex gap-2 text-slate-600">
                 {t("reset")}
               </Button>
             </div>
             
             {placedShips.length === 13 && (
               <Button 
-                className="mt-2 flex gap-3 py-8 text-xl font-black marker-font rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 transition-transform shadow-lg shadow-blue-500/20" 
+                variant="blue"
+                className="mt-2 flex gap-2 w-full" 
                 onClick={() => onComplete(placedShips)}
               >
-                <Play size={24} fill="currentColor" /> {t("start")}
+                <Play size={16} fill="currentColor" /> {t("start")}
               </Button>
             )}
           </div>
