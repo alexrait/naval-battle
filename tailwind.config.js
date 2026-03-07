@@ -7,13 +7,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        ocean: {
-          light: '#3b82f6',
-          DEFAULT: '#1d4ed8',
-          dark: '#1e3a8a',
+        navy: {
+          950: '#020617',
+          900: '#0f172a',
+          800: '#1e293b',
+        },
+        steel: {
+          500: '#64748b',
+          400: '#94a3b8',
+        },
+        gold: {
+          500: '#eab308',
+          600: '#ca8a04',
+          400: '#fde047',
         }
-      }
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        title: ['Outfit', 'sans-serif'],
+      },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 }

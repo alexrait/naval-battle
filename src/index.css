@@ -1,60 +1,72 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Outfit:wght@400;700;900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --navy-950: #020617;
+  --navy-900: #0f172a;
+  --navy-800: #1e293b;
+  --steel-500: #64748b;
+  --steel-400: #94a3b8;
+  --gold-500: #eab308;
+  --gold-600: #ca8a04;
+  --gold-400: #fde047;
+}
+
 body {
   font-family: "Inter", sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
-  margin: 0;
-}
-
-.login-bg {
-  background-image: url('https://images.unsplash.com/photo-1498092651296-641e88c3b057?auto=format&fit=crop&w=2000&q=80');
-  background-size: cover;
-  background-position: center;
-}
-
-
-
-body {
-  background-color: #0f172a;
-  color: #1e293b;
-  font-family: 'Architects Daughter', 'Indie Flower', cursive;
+  background-color: var(--navy-950);
+  color: #f8fafc;
   margin: 0;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .ocean-bg {
-  background: #020617;
-  background-image: linear-gradient(rgba(2, 6, 23, 0.7), rgba(2, 6, 23, 0.7)), url("https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?auto=format&fit=crop&q=80&w=2000");
+  background: var(--navy-950);
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.15) 0%, transparent 80%),
+    linear-gradient(rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.95)), 
+    url("https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?auto=format&fit=crop&q=80&w=2000");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
 }
 
 .iron-panel {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(16px);
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  backdrop-filter: blur(24px);
   box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    0 25px 50px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-.glow-text {
-  text-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+.tactical-font {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.title-font {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+}
+
+.glow-gold {
+  filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.3));
 }
 
 .glass-card {
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 .marker-font {

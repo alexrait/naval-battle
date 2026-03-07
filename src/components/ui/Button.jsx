@@ -6,13 +6,13 @@ const Button = React.forwardRef(({ className, variant = "default", size = "defau
   const Comp = asChild ? Slot : "button"
   
   const variants = {
-    default: "bg-slate-900 text-slate-50 hover:bg-slate-900/90",
-    destructive: "bg-red-500 text-slate-50 hover:bg-red-500/90",
-    outline: "border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 text-slate-900",
-    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-100/80",
-    ghost: "hover:bg-slate-100 hover:text-slate-900 text-slate-600",
-    link: "text-slate-900 underline-offset-4 hover:underline",
-    blue: "bg-blue-600 text-white hover:bg-blue-700"
+    default: "bg-yellow-500 text-slate-950 hover:bg-yellow-400 font-black uppercase tracking-widest shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-all hover:scale-[1.02]",
+    destructive: "bg-red-600 text-white hover:bg-red-500 font-bold",
+    outline: "border-2 border-slate-700 bg-transparent hover:bg-slate-800 text-slate-300 font-bold uppercase tracking-wider",
+    secondary: "bg-slate-800 text-slate-100 hover:bg-slate-700 border border-slate-700",
+    ghost: "hover:bg-slate-800/50 hover:text-white text-slate-400",
+    link: "text-yellow-500 underline-offset-4 hover:underline",
+    blue: "bg-blue-700 text-white hover:bg-blue-600 shadow-lg shadow-blue-900/20"
   }
 
   const sizes = {
