@@ -19,11 +19,26 @@ const GameContent = () => {
   const [currentGameId, setCurrentGameId] = useState(null);
 
   useEffect(() => {
-    if (user) {
-      fetch("/.netlify/functions/sync-user", {
-        method: "POST",
-        body: JSON.stringify({ id: user.id, email: user.email, name: user.user_metadata?.full_name })
-      });
+    if (user?.id && user?.email) {
+      const syncUser = async () => {
+        try {
+          const response = await fetch("/.netlify/functions/sync-user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              id: user.id, 
+              email: user.email, 
+              name: user.user_metadata?.full_name || "Unknown Soldier"
+            })
+          });
+          if (!response.ok) {
+            console.warn(`User sync responded with status: ${response.status}`);
+          }
+        } catch (err) {
+          console.error("Sync user fetch failed", err);
+        }
+      };
+      syncUser();
     }
   }, [user]);
 
@@ -86,7 +101,7 @@ const GameContent = () => {
               <div className="flex items-center gap-6">
                 <div className="flex flex-col items-end">
                   <span className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-0.5">Commander</span>
-                  <span className="text-sm font-black tactical-font text-white">{user.user_metadata?.full_name}</span>
+                  <span className="text-sm font-black tactical-font text-white">{user?.user_metadata?.full_name || "Unknown"}</span>
                 </div>
                 <Button size="sm" variant="outline" onClick={logout} className="h-9 px-4 text-[10px] border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-900/50 transition-all uppercase font-black tracking-widest">
                   {t("logout")}

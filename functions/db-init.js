@@ -10,6 +10,7 @@ export const handler = async (event, context) => {
       CREATE TABLE IF NOT EXISTS navalbattle.users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE,
+        name TEXT,
         wins INTEGER DEFAULT 0,
         losses INTEGER DEFAULT 0,
         last_played TIMESTAMP DEFAULT CURRENT_TIMESTAMP
