@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&family=Architects+Daughter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&family=Architects+Daughter&family=Permanent+Marker&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --paper: #fefcf0;
+  --paper: #fdfdf2;
   --ink: #1e293b;
-  --grid-line: rgba(30, 41, 59, 0.15);
-  --grid-line-bold: rgba(30, 41, 59, 0.3);
+  --grid-line: rgba(30, 41, 59, 0.1);
+  --grid-line-bold: rgba(30, 41, 59, 0.2);
 }
 
 body {
@@ -16,6 +16,17 @@ body {
   color: #1e293b;
   font-family: 'Architects Daughter', 'Indie Flower', cursive;
   margin: 0;
+  overflow-x: hidden;
+}
+
+.ocean-bg {
+  background: #020617;
+  background-image: 
+    radial-gradient(circle at 50% -20%, #1e3a8a 0%, transparent 60%),
+    radial-gradient(circle at 10% 10%, #1e293b 0%, transparent 30%),
+    radial-gradient(circle at 90% 90%, #0f172a 0%, transparent 40%);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
 .paper-board {
@@ -23,47 +34,59 @@ body {
   background-image: 
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-size: 40px 40px; /* Matched to cell size */
   box-shadow: 
-    2px 2px 0 rgba(0,0,0,0.1),
-    10px 10px 0 rgba(0,0,0,0.05),
-    0 0 40px rgba(0,0,0,0.1) inset;
-  border: 1px solid #e5e7eb;
+    0 1px 1px rgba(0,0,0,0.1), 
+    0 10px 0 -5px #eee, 
+    0 10px 1px -4px rgba(0,0,0,0.1), 
+    0 20px 0 -10px #eee, 
+    0 20px 1px -9px rgba(0,0,0,0.1), 
+    0 0 50px rgba(0,0,0,0.1) inset;
+  border: 1px solid #e2e8f0;
   position: relative;
-  transform: rotate(-0.5deg);
+  transition: transform 0.3s ease;
 }
 
-.paper-board::before {
+.paper-board::after {
   content: '';
   position: absolute;
-  top: 0; left: 32px; bottom: 0;
-  width: 2px;
-  background-color: rgba(239, 68, 68, 0.2);
+  top: 0; left: 40px; bottom: 0;
+  width: 1px;
+  background-color: rgba(239, 68, 68, 0.3);
+  z-index: 10;
 }
 
 .hand-drawn-ship {
-  background: none;
-  border: 2px solid var(--ink);
-  border-radius: 40% 40% 30% 30% / 100% 100% 20% 20%;
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  background: rgba(30, 41, 59, 0.05);
+  border: 2px solid rgba(30, 41, 59, 0.8);
+  border-radius: 4px;
+  position: relative;
+}
+
+/* Add some irregular "hand-drawn" borders */
+.hand-drawn-ship::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1px solid rgba(30, 41, 59, 0.4);
+  border-radius: 6px;
+  transform: rotate(1deg);
+}
+
+.marker-font {
+  font-family: 'Permanent Marker', cursive;
 }
 
 .hand-drawn-x {
-  font-family: 'Indie Flower', cursive;
-  font-weight: bold;
-  transform: scale(1.5) rotate(5deg);
+  font-family: 'Permanent Marker', cursive;
+  transform: scale(1.2) rotate(-5deg);
+  opacity: 0.9;
 }
 
 .hand-drawn-circle {
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--ink);
-  border-radius: 50%;
-  opacity: 0.6;
-}
-
-.ocean-bg {
-  background: #1e293b;
-  background-image: radial-gradient(circle at 50% 50%, #334155 0%, #0f172a 100%);
-  min-height: 100vh;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(30, 41, 59, 0.6);
+  border-radius: 50% 40% 60% 50%;
+  transform: rotate(15deg);
 }
