@@ -1,11 +1,11 @@
-import { neon } from "@neondatabase/serverless";
+import { neon } from "@netlify/neon";
 
 export const handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const sql = neon(process.env.DATABASE_URL);
+  const sql = neon();
   
   try {
     const { id, email, name } = JSON.parse(event.body);
@@ -15,24 +15,15 @@ export const handler = async (event) => {
     }
 
     // Upsert user into the users table
-    try {
-      await sql`
-        INSERT INTO navalbattle.users (id, email, name, last_played)
-        VALUES (${id}, ${email}, ${name || 'Unknown Soldier'}, CURRENT_TIMESTAMP)
-        ON CONFLICT (id) 
-        DO UPDATE SET 
-          last_played = CURRENT_TIMESTAMP,
-          email = EXCLUDED.email,
-          name = EXCLUDED.name
-      `;
-    } catch (dbError) {
-      console.error("Database query failed:", dbError);
-      return {
-        statusCode: 500,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Database operation failed", details: dbError.message }),
-      };
-    }
+    await sql`
+      INSERT INTO navalbattle.users (id, email, name, last_played)
+      VALUES (${id}, ${email}, ${name || 'Unknown Soldier'}, CURRENT_TIMESTAMP)
+      ON CONFLICT (id) 
+      DO UPDATE SET 
+        last_played = CURRENT_TIMESTAMP,
+        email = EXCLUDED.email,
+        name = EXCLUDED.name
+    `;
 
     return {
       statusCode: 200,

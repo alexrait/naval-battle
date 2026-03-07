@@ -1,7 +1,7 @@
-import { neon } from "@neondatabase/serverless";
+import { neon } from "@netlify/neon";
 
 export const handler = async (event, context) => {
-  const sql = neon(process.env.DATABASE_URL);
+  const sql = neon();
 
   try {
     await sql`CREATE SCHEMA IF NOT EXISTS navalbattle`;
@@ -38,6 +38,7 @@ export const handler = async (event, context) => {
       body: JSON.stringify({ message: "Database initialized" }),
     };
   } catch (error) {
+    console.error("DB init error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),

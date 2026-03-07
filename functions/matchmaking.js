@@ -1,7 +1,7 @@
-import { neon } from "@neondatabase/serverless";
+import { neon } from "@netlify/neon";
 
 export const handler = async (event, context) => {
-  const sql = neon(process.env.DATABASE_URL);
+  const sql = neon();
   const user = context.clientContext?.user;
 
   if (!user) return { statusCode: 401, body: "Unauthorized" };
@@ -30,6 +30,7 @@ export const handler = async (event, context) => {
       return { statusCode: 200, body: JSON.stringify({ gameId: newGame[0].id, role: "player1" }) };
     }
   } catch (error) {
+    console.error("Matchmaking error:", error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
