@@ -1,15 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&family=Architects+Daughter&family=Permanent+Marker&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --paper: #fdfdf2;
-  --ink: #1e293b;
-  --grid-line: rgba(30, 41, 59, 0.1);
-  --grid-line-bold: rgba(30, 41, 59, 0.2);
+  --background: 222 47% 11%;
+  --foreground: 213 31% 91%;
+  --primary: 217 91% 60%;
+  --muted: 215 25% 27%;
+  --accent: 210 40% 96%;
 }
+
+body {
+  background-color: #020617;
+  color: #f8fafc;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.ocean-bg {
+  background: #020617;
+  background-image: 
+    radial-gradient(circle at 50% -20%, #1e3a8a 0%, transparent 60%),
+    linear-gradient(rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.8)),
+    url("https://images.unsplash.com/photo-1500043356167-97d89656d0b1?auto=format&fit=crop&q=80&w=2000");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.tactical-grid {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.glass-morphism {
+  background: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.command-card {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.4) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.tactical-font {
+  font-family: "JetBrains Mono", monospace;
+}
+
+.hit-marker {
+  animation: hit-pulse 0.5s ease-out;
+  background: radial-gradient(circle, #ef4444 0%, transparent 70%);
+}
+
+@keyframes hit-pulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Animations */
+.fade-up {
+  animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.marker-font { font-family: "JetBrains Mono", monospace; }
+.architect-font { font-family: "Inter", sans-serif; }
+
 
 body {
   background-color: #0f172a;
