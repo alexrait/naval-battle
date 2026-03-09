@@ -62,31 +62,53 @@ export const ShipPlacement = ({ onComplete }) => {
   const cells = placedShips.flatMap(s => s.cells.map(c => ({ ...c, shipId: s.id })));
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full max-w-4xl animate-in fade-in zoom-in-95 duration-500">
+    <div className="flex flex-col items-center gap-4 w-full max-w-4xl animate-in fade-in zoom-in-95 duration-500">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-900 tracking-tight">{t("placeShips")}</h2>
-        <p className="text-slate-500 text-sm mt-2">
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{t("placeShips")}</h2>
+        <p className="text-slate-500 text-sm mt-1">
           {lang === "he" ? "הצב את הצי שלך על הלוח." : "Position your fleet on the board."}
         </p>
       </div>
-      
-      <div className="flex flex-col lg:flex-row gap-8 items-start justify-center w-full">
-        <Grid 
-          cells={cells} 
-          onCellClick={handleCellClick} 
-          showShips 
-          active={!!currentShip} 
-        />
-        
-        <div className="flex flex-col gap-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-full lg:w-72">
+
+      {/* Mobile toolbar — visible below md */}
+      <div className="flex lg:hidden items-center justify-between w-full bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-3 gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl font-bold text-slate-900 leading-none">{placedShips.length}</span>
+          <span className="text-sm text-slate-400 font-medium">/ 13 {t("ships")}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setOrientation(prev => prev === "horizontal" ? "vertical" : "horizontal")} className="flex gap-1.5">
+            <RotateCw className={cn("transition-transform duration-300", orientation === "vertical" ? "rotate-90" : "")} size={14} />
+            {orientation === "horizontal" ? (lang === "he" ? "אופקי" : "H") : (lang === "he" ? "אנכי" : "V")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={randomize} className="flex gap-1.5">
+            <Shuffle size={14} /> {t("randomize")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={reset} className="text-slate-600">{t("reset")}</Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-8 items-start justify-center w-full">
+        {/* Grid — centered on mobile */}
+        <div className="w-full flex justify-center lg:block">
+          <Grid
+            cells={cells}
+            onCellClick={handleCellClick}
+            showShips
+            active={!!currentShip}
+          />
+        </div>
+
+        {/* Desktop side panel — hidden on mobile */}
+        <div className="hidden lg:flex flex-col gap-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-72 shrink-0">
           <div className="flex justify-between items-center pb-4 border-b border-slate-100">
             <div className="flex flex-col">
               <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">{t("ships")}</span>
               <span className="text-xl font-bold text-slate-900">{placedShips.length} <span className="text-sm text-slate-400 font-medium">/ 13</span></span>
             </div>
-            <Button 
-              size="icon" 
-              variant="outline" 
+            <Button
+              size="icon"
+              variant="outline"
               onClick={() => setOrientation(prev => prev === "horizontal" ? "vertical" : "horizontal")}
             >
               <RotateCw className={cn("transition-transform duration-300", orientation === "vertical" ? "rotate-90" : "")} size={18} />
@@ -125,19 +147,20 @@ export const ShipPlacement = ({ onComplete }) => {
                 {t("reset")}
               </Button>
             </div>
-            
-            {placedShips.length === 13 && (
-              <Button 
-                variant="blue"
-                className="mt-2 flex gap-2 w-full" 
-                onClick={() => onComplete(placedShips)}
-              >
-                <Play size={16} fill="currentColor" /> {t("start")}
-              </Button>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Start button — shown when all ships placed */}
+      {placedShips.length === 13 && (
+        <Button
+          variant="blue"
+          className="w-full max-w-sm mt-2 h-14 flex gap-2 text-base font-black uppercase tracking-widest"
+          onClick={() => onComplete(placedShips)}
+        >
+          <Play size={18} fill="currentColor" /> {t("start")}
+        </Button>
+      )}
     </div>
   );
 };

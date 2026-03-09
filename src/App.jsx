@@ -88,7 +88,7 @@ const GameContent = () => {
   };
 
   return (
-    <div className="ocean-bg relative min-h-screen w-full flex flex-col font-sans overflow-x-hidden text-slate-100 selection:bg-yellow-500/30">
+    <div className="ocean-bg relative min-h-screen w-full flex flex-col font-sans text-slate-100 selection:bg-yellow-500/30">
       
       {/* Professional Header */}
       {user && (
@@ -145,10 +145,10 @@ const GameContent = () => {
         </div>
       )}
 
-      <main className={`relative flex-1 w-full flex flex-col items-center p-4 md:p-6 ${
+      <main className={`relative flex-1 w-full flex flex-col items-center px-4 md:px-6 ${
         gameState === "idle"
-          ? "justify-center overflow-hidden fixed inset-0 z-10"
-          : "justify-start overflow-y-auto pt-6 pb-12"
+          ? "justify-center py-8 min-h-[calc(100vh-4rem)]"
+          : "justify-start py-6 pb-16"
       }`}>
         
         {/* CENTERED PREMIUM LOGIN SCREEN */}
@@ -259,11 +259,9 @@ const GameContent = () => {
         )}
       </main>
 
-      {user && (
-        <footer className="relative z-10 w-full p-8 text-center text-slate-600 text-[10px] font-bold uppercase tracking-[0.5em]">
-          &copy; {new Date().getFullYear()} Iron & Tide Strategy Group • Classified Operational Unit
-        </footer>
-      )}
+      <footer className="relative z-10 w-full py-4 px-4 text-center text-slate-600 text-[10px] font-bold uppercase tracking-[0.5em] border-t border-slate-800/30">
+        &copy; {new Date().getFullYear()} Iron &amp; Tide Strategy Group • Classified Operational Unit
+      </footer>
     </div>
   );
 };
