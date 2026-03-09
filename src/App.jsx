@@ -12,11 +12,17 @@ import { cn } from "./lib/utils";
 const GameContent = () => {
   const { t, lang, toggleLanguage } = useLanguage();
   const { user, login, logout } = useAuth();
-  const [gameState, setGameState] = useState("idle"); 
+  const [gameState, setGameState] = useState("idle");
   const [playerShips, setPlayerShips] = useState([]);
   const [invite, setInvite] = useState(null);
   const [targetEmail, setTargetEmail] = useState("");
   const [currentGameId, setCurrentGameId] = useState(null);
+  const [toast, setToast] = useState(null); // { message, type: 'success'|'error' }
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     if (user?.id && user?.email) {
@@ -49,7 +55,7 @@ const GameContent = () => {
         setCurrentGameId(data.gameId);
         setGameState("placement");
       } else {
-        alert(`${data.responderName} declined your invite.`);
+        showToast(`${data.responderName} declined your invite.`, "error");
       }
     }
   });
@@ -65,8 +71,12 @@ const GameContent = () => {
         senderName: user.user_metadata?.full_name || "Unknown Commander",
       })
     });
-    if (res.ok) alert("Invite sent!");
-    else alert("User not found or error");
+    if (res.ok) {
+      showToast(lang === "he" ? "ההזמנה נשלחה בהצלחה!" : "Invite sent successfully!");
+      setTargetEmail("");
+    } else {
+      showToast(lang === "he" ? "משתמש לא נמצא" : "User not found or error", "error");
+    }
   };
 
   const respondInvite = async (accepted) => {
@@ -89,7 +99,18 @@ const GameContent = () => {
 
   return (
     <div className="ocean-bg relative min-h-screen w-full flex flex-col font-sans text-slate-100 selection:bg-yellow-500/30">
-      
+
+      {/* Toast notification */}
+      {toast && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-2xl text-sm font-black uppercase tracking-widest animate-in slide-in-from-bottom-4 duration-300 ${
+          toast.type === "error"
+            ? "bg-red-600 text-white"
+            : "bg-emerald-500 text-white"
+        }`}>
+          {toast.type === "success" ? "✓ " : "✕ "}{toast.message}
+        </div>
+      )}
+
       {/* Professional Header */}
       {user && (
         <header className="relative z-20 w-full px-4 md:px-8 py-3 md:py-5 border-b border-slate-700/50 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
