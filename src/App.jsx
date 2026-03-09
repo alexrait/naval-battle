@@ -92,29 +92,30 @@ const GameContent = () => {
       
       {/* Professional Header */}
       {user && (
-        <header className="relative z-20 w-full px-8 py-5 border-b border-slate-700/50 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
+        <header className="relative z-20 w-full px-4 md:px-8 py-3 md:py-5 border-b border-slate-700/50 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/10 border border-yellow-400/50 transition-transform hover:rotate-3">
-                <Anchor className="text-slate-950" size={26} strokeWidth={2.5} />
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="w-9 h-9 md:w-12 md:h-12 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/10 border border-yellow-400/50 transition-transform hover:rotate-3 shrink-0">
+                <Anchor className="text-slate-950" size={20} strokeWidth={2.5} />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-2xl font-black tracking-tighter title-font uppercase text-white leading-none">IRON & TIDE</span>
-                <span className="text-[10px] text-yellow-500 uppercase tracking-[0.5em] font-black mt-1 opacity-80">{t("subtitle")}</span>
+                <span className="text-lg md:text-2xl font-black tracking-tighter title-font uppercase text-white leading-none">IRON &amp; TIDE</span>
+                <span className="hidden md:block text-[10px] text-yellow-500 uppercase tracking-[0.5em] font-black mt-1 opacity-80">{t("subtitle")}</span>
               </div>
             </div>
             
-            <div className="flex items-center gap-8">
-              <Button variant="ghost" onClick={toggleLanguage} className="text-xs h-9 font-bold tracking-widest uppercase text-slate-300 hover:text-white">
-                {lang === "en" ? "עברית" : "ENGLISH"}
+            <div className="flex items-center gap-2 md:gap-8">
+              <Button variant="ghost" onClick={toggleLanguage} className="text-xs h-8 md:h-9 px-2 md:px-3 font-bold tracking-widest uppercase text-slate-300 hover:text-white">
+                {lang === "en" ? "עב'" : "EN"}
+                <span className="hidden md:inline">{lang === "en" ? "רית" : "GLISH"}</span>
               </Button>
-              <div className="h-6 w-px bg-slate-700/50" />
-              <div className="flex items-center gap-6">
-                <div className="flex flex-col items-end">
+              <div className="hidden md:block h-6 w-px bg-slate-700/50" />
+              <div className="flex items-center gap-2 md:gap-6">
+                <div className="hidden md:flex flex-col items-end">
                   <span className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-0.5">Commander</span>
                   <span className="text-sm font-black tactical-font text-white">{user?.user_metadata?.full_name || "Unknown"}</span>
                 </div>
-                <Button size="sm" variant="outline" onClick={logout} className="h-9 px-4 text-[10px] border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-900/50 transition-all uppercase font-black tracking-widest">
+                <Button size="sm" variant="outline" onClick={logout} className="h-8 md:h-9 px-3 md:px-4 text-[10px] border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-900/50 transition-all uppercase font-black tracking-widest">
                   {t("logout")}
                 </Button>
               </div>
@@ -144,7 +145,11 @@ const GameContent = () => {
         </div>
       )}
 
-      <main className="relative flex-1 w-full flex flex-col items-center justify-center p-6 overflow-hidden" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}>
+      <main className={`relative flex-1 w-full flex flex-col items-center p-4 md:p-6 ${
+        gameState === "idle"
+          ? "justify-center overflow-hidden fixed inset-0 z-10"
+          : "justify-start overflow-y-auto pt-6 pb-12"
+      }`}>
         
         {/* CENTERED PREMIUM LOGIN SCREEN */}
         {!user && gameState === "idle" && (
