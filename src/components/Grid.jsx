@@ -36,38 +36,36 @@ export const Grid = ({
             {/* Cells */}
             {Array.from({ length: GRID_SIZE }).map((_, colIndex) => {
               const cell = cells.find(c => c.x === colIndex && c.y === rowIndex);
-              const isHit  = cell?.status === "hit";
-              const isSunk = cell?.status === "sunk";
-              const isMiss = cell?.status === "miss";
-              const hasShip = cell?.shipId && showShips;
-              const isMarked = isHit || isSunk;
+              const isHit     = cell?.status === "hit";
+              const isSunk    = cell?.status === "sunk";
+              const isMiss    = cell?.status === "miss";
+              const isBlocked = cell?.status === "blocked";
+              const hasShip   = cell?.shipId && showShips;
+              const isMarked  = isHit || isSunk;
 
               return (
                 <button
                   key={`${colIndex}-${rowIndex}`}
-                  disabled={!active || isMarked || isMiss}
+                  disabled={!active || isMarked || isMiss || isBlocked}
                   onClick={() => onCellClick?.(colIndex, rowIndex)}
                   className={cn(
                     "w-[clamp(1.2rem,5vw,2.5rem)] h-[clamp(1.2rem,5vw,2.5rem)] border rounded-sm transition-colors relative flex items-center justify-center",
-                    // default
                     "border-slate-200",
-                    !isMarked && !isMiss && active  && "hover:bg-slate-100 cursor-pointer",
-                    !active   && !isMarked && !isMiss && "bg-slate-50/50 cursor-default",
-                    // ship (placement / your fleet)
-                    hasShip && !isMarked && !isMiss  && "bg-blue-100 border-blue-300",
-                    // miss — grey dot
+                    !isMarked && !isMiss && !isBlocked && active  && "hover:bg-slate-100 cursor-pointer",
+                    !active && !isMarked && !isMiss && !isBlocked && "bg-slate-50/50 cursor-default",
+                    hasShip  && !isMarked && !isMiss && "bg-blue-100 border-blue-300",
                     isMiss   && "bg-slate-100",
-                    // hit — red tint + X
-                    isHit    && "bg-red-50 border-red-300",
-                    // sunk — darker red + thicker border
-                    isSunk   && "bg-red-100 border-red-500 border-2"
+                    isBlocked && "bg-slate-50 cursor-not-allowed opacity-60",
+                    // hit: just light red + X, no thick border
+                    isHit  && "bg-red-50 border-red-200",
+                    // sunk: darker red + thick border on ALL sunk cells of the ship
+                    isSunk && "bg-red-100 border-red-500 border-2"
                   )}
                 >
                   {isMiss && (
                     <div className="w-[clamp(0.3rem,1.5vw,0.5rem)] h-[clamp(0.3rem,1.5vw,0.5rem)] rounded-full bg-slate-300" />
                   )}
                   {(isHit || isSunk) && (
-                    // Bold X using SVG
                     <svg
                       viewBox="0 0 10 10"
                       className="w-[clamp(0.6rem,2.5vw,1rem)] h-[clamp(0.6rem,2.5vw,1rem)]"
