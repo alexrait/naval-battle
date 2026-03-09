@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Outfit:wght@400;700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Outfit:wght@400;700;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -16,12 +16,16 @@
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Inter", "Rubik", sans-serif;
   background-color: var(--navy-950);
   color: #f8fafc;
   margin: 0;
   overflow-x: hidden;
   min-height: 100vh;
+}
+
+[dir="rtl"], [dir="rtl"] body {
+  font-family: "Rubik", "Inter", sans-serif;
 }
 
 .ocean-bg {
@@ -54,8 +58,12 @@ body {
 }
 
 .title-font {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Rubik', sans-serif;
   font-weight: 900;
+}
+
+.font-rubik {
+  font-family: 'Rubik', sans-serif;
 }
 
 .glow-gold {

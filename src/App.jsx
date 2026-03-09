@@ -126,11 +126,21 @@ const GameContent = () => {
             </div>
             
             <div className="flex items-center gap-2 md:gap-8">
-              <Button variant="ghost" onClick={toggleLanguage} className="text-xs h-8 md:h-9 px-2 md:px-3 font-bold tracking-widest uppercase text-slate-300 hover:text-white">
-                <span dir={lang === "en" ? "rtl" : "ltr"} className="flex gap-0.5">
-                  {lang === "en" ? "עב'" : "EN"}
-                  <span className="hidden md:inline">{lang === "en" ? "רית" : "GLISH"}</span>
-                </span>
+              <Button variant="ghost" onClick={toggleLanguage} className="h-8 md:h-9 px-2 md:px-3 text-slate-300 hover:text-white transition-colors">
+                <div className={cn(
+                  "flex items-center gap-0.5 font-bold",
+                  lang === "en" ? "font-rubik text-sm" : "tracking-widest uppercase text-xs"
+                )}>
+                  {lang === "en" ? (
+                    <span dir="rtl" className="flex">
+                      עב<span className="hidden md:inline">רית</span>
+                    </span>
+                  ) : (
+                    <span className="flex">
+                      EN<span className="hidden md:inline">GLISH</span>
+                    </span>
+                  )}
+                </div>
               </Button>
               <div className="hidden md:block h-6 w-px bg-slate-700/50" />
               <div className="flex items-center gap-2 md:gap-6">
