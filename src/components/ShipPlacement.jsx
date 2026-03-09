@@ -7,7 +7,7 @@ import { RotateCw, Shuffle, Play } from "lucide-react";
 import { cn } from "../lib/utils";
 
 export const ShipPlacement = ({ onComplete }) => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [placedShips, setPlacedShips] = useState([]);
   const [currentShipIndex, setCurrentShipIndex] = useState(0);
   const [orientation, setOrientation] = useState("horizontal");
