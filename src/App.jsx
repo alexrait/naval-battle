@@ -34,7 +34,7 @@ const GameContent = () => {
             body: JSON.stringify({ 
               id: user.id, 
               email: user.email, 
-              name: user.user_metadata?.full_name || "Unknown Soldier"
+              name: user.user_metadata?.full_name || t("unknownSoldier")
             })
           });
           if (!response.ok) {
@@ -55,7 +55,7 @@ const GameContent = () => {
         setCurrentGameId(data.gameId);
         setGameState("placement");
       } else {
-        showToast(`${data.responderName} declined your invite.`, "error");
+        showToast(`${data.responderName} ${t("declined")}`, "error");
       }
     }
   });
@@ -68,14 +68,14 @@ const GameContent = () => {
       body: JSON.stringify({
         targetEmail,
         senderId: user.id,
-        senderName: user.user_metadata?.full_name || "Unknown Commander",
+        senderName: user.user_metadata?.full_name || t("unknownCommander"),
       })
     });
     if (res.ok) {
-      showToast(lang === "he" ? "ההזמנה נשלחה בהצלחה!" : "Invite sent successfully!");
+      showToast(t("inviteSent"));
       setTargetEmail("");
     } else {
-      showToast(lang === "he" ? "משתמש לא נמצא" : "User not found or error", "error");
+      showToast(t("userNotFound"), "error");
     }
   };
 
@@ -120,21 +120,23 @@ const GameContent = () => {
                 <Anchor className="text-slate-950" size={20} strokeWidth={2.5} />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-lg md:text-2xl font-black tracking-tighter title-font uppercase text-white leading-none">IRON &amp; TIDE</span>
+                <span className="text-lg md:text-2xl font-black tracking-tighter title-font uppercase text-white leading-none">{t("title")}</span>
                 <span className="hidden md:block text-[10px] text-yellow-500 uppercase tracking-[0.5em] font-black mt-1 opacity-80">{t("subtitle")}</span>
               </div>
             </div>
             
             <div className="flex items-center gap-2 md:gap-8">
               <Button variant="ghost" onClick={toggleLanguage} className="text-xs h-8 md:h-9 px-2 md:px-3 font-bold tracking-widest uppercase text-slate-300 hover:text-white">
-                {lang === "en" ? "עב'" : "EN"}
-                <span className="hidden md:inline">{lang === "en" ? "רית" : "GLISH"}</span>
+                <span dir={lang === "en" ? "rtl" : "ltr"} className="flex gap-0.5">
+                  {lang === "en" ? "עב'" : "EN"}
+                  <span className="hidden md:inline">{lang === "en" ? "רית" : "GLISH"}</span>
+                </span>
               </Button>
               <div className="hidden md:block h-6 w-px bg-slate-700/50" />
               <div className="flex items-center gap-2 md:gap-6">
                 <div className="hidden md:flex flex-col items-end">
-                  <span className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-0.5">Commander</span>
-                  <span className="text-sm font-black tactical-font text-white">{user?.user_metadata?.full_name || "Unknown"}</span>
+                  <span className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-0.5">{t("commander")}</span>
+                  <span className="text-sm font-black tactical-font text-white">{user?.user_metadata?.full_name || t("unknownSoldier")}</span>
                 </div>
                 <Button size="sm" variant="outline" onClick={logout} className="h-8 md:h-9 px-3 md:px-4 text-[10px] border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-900/50 transition-all uppercase font-black tracking-widest">
                   {t("logout")}
@@ -155,12 +157,12 @@ const GameContent = () => {
               </div>
               <div>
                 <p className="text-xl font-black tactical-font uppercase text-blue-900 leading-tight">{invite.senderName}</p>
-                <p className="text-sm text-slate-500 mt-2">{lang === "he" ? "מזמין אותך לקרב ימי!" : "requests a naval engagement!"}</p>
+                <p className="text-sm text-slate-500 mt-2">{t("requestsBattle")}</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <Button className="flex-1 h-14 text-sm font-black uppercase tracking-widest bg-blue-600" onClick={() => respondInvite(true)}>{lang === "he" ? "קבל" : "ACCEPT"}</Button>
-              <Button variant="outline" className="flex-1 h-14 text-sm font-black uppercase tracking-widest border-blue-100 text-blue-600 hover:bg-blue-50" onClick={() => respondInvite(false)}>{lang === "he" ? "דחה" : "DECLINE"}</Button>
+              <Button className="flex-1 h-14 text-sm font-black uppercase tracking-widest bg-blue-600" onClick={() => respondInvite(true)}>{t("accept")}</Button>
+              <Button variant="outline" className="flex-1 h-14 text-sm font-black uppercase tracking-widest border-blue-100 text-blue-600 hover:bg-blue-50" onClick={() => respondInvite(false)}>{t("decline")}</Button>
             </div>
           </div>
         </div>
@@ -184,10 +186,10 @@ const GameContent = () => {
               <div className="absolute -top-32 -left-32 w-64 h-64 bg-gold-400/10 blur-[100px] rounded-full" />
               
               <div className="relative">
-                <h1 className="text-8xl font-black text-white tracking-tighter title-font uppercase mb-6 leading-none select-none" style={{ fontSize: '5rem' }}>Iron & Tide</h1>
+                <h1 className="text-8xl font-black text-white tracking-tighter title-font uppercase mb-6 leading-none select-none" style={{ fontSize: '5rem' }}>{t("title")}</h1>
                 <div className="flex items-center justify-center gap-6 text-gold-500/40 font-black uppercase tracking-[0.6em] text-[12px]">
                   <div className="h-px w-12 bg-gold-500/20" />
-                  <span>COMMAND SECTOR</span>
+                  <span>{t("commandSector")}</span>
                   <div className="h-px w-12 bg-gold-500/20" />
                 </div>
               </div>
@@ -219,12 +221,12 @@ const GameContent = () => {
                   }}
                   className="hover:bg-gold-400 active:scale-[0.97]"
                 >
-                  Login with Google
+                  {t("login")}
                 </button>
                 <div className="flex flex-col items-center gap-3 mt-4">
                   <div className="flex items-center gap-3 text-[11px] text-slate-500 font-bold uppercase tracking-[0.3em] opacity-60">
                     <Shield size={14} className="text-gold-500/50" />
-                    <span>Secure Tactical Uplink Active</span>
+                    <span>{t("secureUplink")}</span>
                   </div>
                 </div>
               </div>
@@ -247,7 +249,7 @@ const GameContent = () => {
                   </div>
                   <Input 
                     type="email" 
-                    placeholder="TARGET COORDINATES (EMAIL)"
+                    placeholder={t("targetCoordinates")}
                     className="h-16 pl-14 rounded-2xl bg-slate-900/50 border-slate-700/50 focus:border-yellow-500/50 focus:bg-slate-900 focus:ring-yellow-500/20 text-lg font-bold tactical-font placeholder:text-slate-600 transition-all uppercase"
                     value={targetEmail}
                     onChange={(e) => setTargetEmail(e.target.value)}
@@ -263,9 +265,9 @@ const GameContent = () => {
               </div>
               <div className="flex items-center gap-4 text-slate-500 font-bold text-[10px] tracking-[0.3em] uppercase">
                 <Shield size={14} />
-                <span>Sector Secure</span>
+                <span>{t("sectorSecure")}</span>
                 <div className="w-1 h-1 bg-slate-700 rounded-full" />
-                <span>Ready for Engagement</span>
+                <span>{t("readyForEngagement")}</span>
               </div>
             </div>
           </div>
@@ -281,7 +283,7 @@ const GameContent = () => {
       </main>
 
       <footer className="relative z-10 w-full py-4 px-4 text-center text-slate-600 text-[10px] font-bold uppercase tracking-[0.5em] border-t border-slate-800/30">
-        &copy; {new Date().getFullYear()} Iron &amp; Tide Strategy Group • Classified Operational Unit
+        &copy; {new Date().getFullYear()} {t("copyright")}
       </footer>
     </div>
   );

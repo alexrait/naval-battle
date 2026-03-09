@@ -168,8 +168,8 @@ export const GameBoard = ({ initialShips, gameId, user }) => {
         <div className={cn("w-2.5 h-2.5 rounded-full", isMyTurn ? "bg-white animate-pulse" : "bg-slate-400")} />
         <span className="text-sm font-black uppercase tracking-widest text-white">
           {isMyTurn
-            ? (lang === "he" ? "תורך — ירה!" : "Your Turn — Fire!")
-            : (lang === "he" ? "ממתין ליריב..." : "Waiting for opponent...")}
+            ? t("yourTurnFire")
+            : t("waitingForOpponent")}
         </span>
       </div>
 

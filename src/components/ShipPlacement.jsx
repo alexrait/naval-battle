@@ -66,7 +66,7 @@ export const ShipPlacement = ({ onComplete }) => {
       <div className="text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{t("placeShips")}</h2>
         <p className="text-slate-500 text-sm mt-1">
-          {lang === "he" ? "הצב את הצי שלך על הלוח." : "Position your fleet on the board."}
+          {t("positionFleetDesc")}
         </p>
       </div>
 
@@ -79,7 +79,7 @@ export const ShipPlacement = ({ onComplete }) => {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setOrientation(prev => prev === "horizontal" ? "vertical" : "horizontal")} className="flex gap-1.5">
             <RotateCw className={cn("transition-transform duration-300", orientation === "vertical" ? "rotate-90" : "")} size={14} />
-            {orientation === "horizontal" ? (lang === "he" ? "אופקי" : "H") : (lang === "he" ? "אנכי" : "V")}
+            {orientation === "horizontal" ? t("h_short") : t("v_short")}
           </Button>
           <Button variant="outline" size="sm" onClick={randomize} className="flex gap-1.5">
             <Shuffle size={14} /> {t("randomize")}
@@ -125,7 +125,7 @@ export const ShipPlacement = ({ onComplete }) => {
                   isDone ? "bg-slate-50 text-slate-400" : "bg-white border border-slate-200"
                 )}>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium">{s.name}</span>
+                    <span className="text-sm font-medium">{t(s.name)}</span>
                     <div className="flex gap-1">
                       {Array.from({length: s.size}).map((_, i) => (
                         <div key={i} className={cn("w-2 h-2 rounded-sm", isDone ? "bg-slate-300" : "bg-blue-400")} />
