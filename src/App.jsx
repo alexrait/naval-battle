@@ -255,7 +255,7 @@ const GameContent = () => {
         )}
         
         {gameState === "playing" && (
-          <GameBoard initialShips={playerShips} gameId={currentGameId} />
+        <GameBoard initialShips={playerShips} gameId={currentGameId} user={user} />
         )}
       </main>
 

@@ -10,7 +10,7 @@ const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_CLUSTER;
 
 const getCurrentUserId = () => window.netlifyIdentity?.currentUser?.()?.id;
 
-export const GameBoard = ({ initialShips, gameId }) => {
+export const GameBoard = ({ initialShips, gameId, user }) => {
   const { t, lang } = useLanguage();
   const [playerShips] = useState(initialShips || []);
   const [opponentCells, setOpponentCells] = useState([]);
@@ -31,7 +31,7 @@ export const GameBoard = ({ initialShips, gameId }) => {
     await fetch("/.netlify/functions/report-result", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ gameId, x, y, status, senderId: getCurrentUserId() })
+      body: JSON.stringify({ gameId, x, y, status, senderId: user?.id })
     });
     setTurn("player");
   };
@@ -51,13 +51,13 @@ export const GameBoard = ({ initialShips, gameId }) => {
     const channel = pusher.subscribe(`game-${gameId}`);
 
     channel.bind("fire", (data) => {
-      if (data.senderId !== getCurrentUserId()) {
+      if (data.senderId !== user?.id) {
         handleIncomingFire(data.x, data.y);
       }
     });
 
     channel.bind("fire-result", (data) => {
-      if (data.senderId !== getCurrentUserId()) {
+      if (data.senderId !== user?.id) {
         handleFireResult(data.x, data.y, data.status);
       }
     });
@@ -74,7 +74,7 @@ export const GameBoard = ({ initialShips, gameId }) => {
     await fetch("/.netlify/functions/fire", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ gameId, x, y, senderId: getCurrentUserId() })
+      body: JSON.stringify({ gameId, x, y, senderId: user?.id })
     });
   };
 
