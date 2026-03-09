@@ -14,7 +14,7 @@ export const handler = async (event) => {
   });
 
   try {
-    const { gameId, x, y, status, senderId } = JSON.parse(event.body);
+    const { gameId, x, y, status, senderId, keepTurn, sunkCells } = JSON.parse(event.body);
 
     if (!gameId || x == null || y == null || !status) {
       return {
@@ -23,8 +23,12 @@ export const handler = async (event) => {
       };
     }
 
-    // Broadcast fire-result so the attacking player updates their board
-    await pusher.trigger(`game-${gameId}`, "fire-result", { x, y, status, senderId });
+    // Broadcast fire-result so the attacking player updates their board.
+    // keepTurn=true means the attacker gets another shot (they hit something).
+    // sunkCells contains all cells of the ship that was just sunk (if any).
+    await pusher.trigger(`game-${gameId}`, "fire-result", {
+      x, y, status, senderId, keepTurn, sunkCells: sunkCells || null,
+    });
 
     return {
       statusCode: 200,
