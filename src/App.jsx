@@ -136,7 +136,7 @@ const GameContent = () => {
                       עב<span className="hidden md:inline">רית</span>
                     </span>
                   ) : (
-                    <span className="flex">
+                    <span dir="ltr" className="flex">
                       EN<span className="hidden md:inline">GLISH</span>
                     </span>
                   )}
