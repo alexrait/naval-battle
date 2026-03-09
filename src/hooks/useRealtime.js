@@ -17,7 +17,11 @@ export const useRealtime = (userId, onInvite) => {
     const channel = pusherInstance.subscribe(`user-${userId}`);
     
     channel.bind("incoming-invite", (data) => {
-      if (onInvite) onInvite(data);
+      if (onInvite) onInvite({ ...data, type: "incoming-invite" });
+    });
+
+    channel.bind("invite-response", (data) => {
+      if (onInvite) onInvite({ ...data, type: "invite-response" });
     });
 
     setPusher(pusherInstance);

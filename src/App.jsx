@@ -58,7 +58,12 @@ const GameContent = () => {
     if (!targetEmail) return;
     const res = await fetch("/.netlify/functions/send-invite", {
       method: "POST",
-      body: JSON.stringify({ targetEmail })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        targetEmail,
+        senderId: user.id,
+        senderName: user.user_metadata?.full_name || "Unknown Commander",
+      })
     });
     if (res.ok) alert("Invite sent!");
     else alert("User not found or error");
@@ -67,7 +72,13 @@ const GameContent = () => {
   const respondInvite = async (accepted) => {
     await fetch("/.netlify/functions/respond-invite", {
       method: "POST",
-      body: JSON.stringify({ gameId: invite.gameId, senderId: invite.senderId, accepted })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameId: invite.gameId,
+        senderId: invite.senderId,
+        accepted,
+        responderName: user.user_metadata?.full_name || "Unknown Commander",
+      })
     });
     if (accepted) {
       setCurrentGameId(invite.gameId);
