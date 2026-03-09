@@ -14,6 +14,12 @@ export const ShipPlacement = ({ onComplete }) => {
 
   const currentShip = SHIPS_CONFIG.flatMap(s => Array(s.count).fill(s))[currentShipIndex];
 
+  // Returns true if (cx, cy) is occupied by or adjacent (incl. diagonals) to any placed ship
+  const isTouching = (cx, cy, placedList) =>
+    placedList.some(s =>
+      s.cells.some(c => Math.abs(c.x - cx) <= 1 && Math.abs(c.y - cy) <= 1)
+    );
+
   const handleCellClick = (x, y) => {
     if (!currentShip) return;
     const newShip = { id: `ship-${currentShipIndex}`, size: currentShip.size, x, y, orientation, cells: [] };
@@ -21,7 +27,7 @@ export const ShipPlacement = ({ onComplete }) => {
       const cellX = orientation === "horizontal" ? x + i : x;
       const cellY = orientation === "vertical" ? y + i : y;
       if (cellX >= GRID_SIZE || cellY >= GRID_SIZE) return;
-      if (placedShips.some(s => s.cells.some(c => c.x === cellX && c.y === cellY))) return;
+      if (isTouching(cellX, cellY, placedShips)) return;
       newShip.cells.push({ x: cellX, y: cellY });
     }
     setPlacedShips([...placedShips, newShip]);
@@ -38,14 +44,14 @@ export const ShipPlacement = ({ onComplete }) => {
         const x = Math.floor(Math.random() * (orient === "horizontal" ? GRID_SIZE - ship.size : GRID_SIZE));
         const y = Math.floor(Math.random() * (orient === "vertical" ? GRID_SIZE - ship.size : GRID_SIZE));
         const cells = [];
-        let overlap = false;
+        let conflict = false;
         for (let i = 0; i < ship.size; i++) {
           const cx = orient === "horizontal" ? x + i : x;
           const cy = orient === "vertical" ? y + i : y;
-          if (newPlaced.some(s => s.cells.some(c => c.x === cx && c.y === cy))) { overlap = true; break; }
+          if (newPlaced.some(s => s.cells.some(c => Math.abs(c.x - cx) <= 1 && Math.abs(c.y - cy) <= 1))) { conflict = true; break; }
           cells.push({ x: cx, y: cy });
         }
-        if (!overlap) { newPlaced.push({ id: `ship-${idx}`, size: ship.size, x, y, orientation: orient, cells }); placed = true; }
+        if (!conflict) { newPlaced.push({ id: `ship-${idx}`, size: ship.size, x, y, orientation: orient, cells }); placed = true; }
       }
     });
     setPlacedShips(newPlaced);
