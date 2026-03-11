@@ -51,7 +51,7 @@ const translations = {
     Submarine: "Submarine",
   },
   he: {
-    title: "ברזל וגאות",
+    title: "קרב ימי",
     subtitle: "סימולטור קרב ימי",
     fire: "אש!",
     miss: "החטאה",
@@ -104,12 +104,23 @@ const translations = {
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("gameLanguage") || "en";
+    }
+    return "en";
+  });
 
   const t = (key) => translations[lang][key] || key;
 
   const toggleLanguage = () => {
-    setLang((prev) => (prev === "en" ? "he" : "en"));
+    setLang((prev) => {
+      const nextLang = prev === "en" ? "he" : "en";
+      if (typeof window !== "undefined") {
+        localStorage.setItem("gameLanguage", nextLang);
+      }
+      return nextLang;
+    });
   };
 
   useEffect(() => {
