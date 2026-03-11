@@ -19,16 +19,23 @@ export const handler = async (event) => {
   try {
     const { targetEmail, senderName, senderId } = JSON.parse(event.body);
 
-    if (!targetEmail || !senderId) {
+    let normalizedTarget = targetEmail.trim().toLowerCase();
+    normalizedTarget = normalizedTarget.split('@')[0];
+    normalizedTarget = normalizedTarget.split('+')[0];
+    normalizedTarget = normalizedTarget.replace(/\./g, '');
+
+    if (!normalizedTarget || !senderId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing targetEmail or senderId" }),
+        body: JSON.stringify({ error: "Missing valid targetEmail or senderId" }),
       };
     }
 
-    // Look up target user by email
+    // Look up target user by comparing the normalized name part of their email
     const users = await sql`
-      SELECT id, email, name FROM navalbattle.users WHERE email = ${targetEmail} LIMIT 1
+      SELECT id, email, name FROM navalbattle.users 
+      WHERE REPLACE(SPLIT_PART(SPLIT_PART(LOWER(email), '@', 1), '+', 1), '.', '') = ${normalizedTarget} 
+      LIMIT 1
     `;
 
     if (users.length === 0) {

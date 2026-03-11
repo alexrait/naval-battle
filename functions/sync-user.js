@@ -14,16 +14,30 @@ export const handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: "Missing user ID or email" }) };
     }
 
-    // Upsert user into the users table
-    await sql`
-      INSERT INTO navalbattle.users (id, email, name, last_played)
-      VALUES (${id}, ${email}, ${name || 'Unknown Soldier'}, CURRENT_TIMESTAMP)
-      ON CONFLICT (id) 
-      DO UPDATE SET 
-        last_played = CURRENT_TIMESTAMP,
-        email = EXCLUDED.email,
-        name = EXCLUDED.name
-    `;
+    try {
+      // Upsert user into the users table (resolves conflicts on existing ID)
+      await sql`
+        INSERT INTO navalbattle.users (id, email, name, last_played)
+        VALUES (${id}, ${email}, ${name || 'Unknown Soldier'}, CURRENT_TIMESTAMP)
+        ON CONFLICT (id) 
+        DO UPDATE SET 
+          last_played = CURRENT_TIMESTAMP,
+          email = EXCLUDED.email,
+          name = EXCLUDED.name
+      `;
+    } catch (insertError) {
+      if (insertError.message && insertError.message.includes('unique constraint "users_email_key"')) {
+        // If a user was deleted & recreated in Netlify, they hold a new ID but the same email.
+        // In this case, we update the existing row to use their fresh ID.
+        await sql`
+          UPDATE navalbattle.users
+          SET id = ${id}, last_played = CURRENT_TIMESTAMP, name = ${name || 'Unknown Soldier'}
+          WHERE email = ${email}
+        `;
+      } else {
+        throw insertError;
+      }
+    }
 
     return {
       statusCode: 200,
