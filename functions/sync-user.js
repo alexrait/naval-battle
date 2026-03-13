@@ -1,5 +1,15 @@
 import { neon } from "@netlify/neon";
 
+const normalizeEmail = (email) => {
+  if (!email) return null;
+  const [local, domain] = email.toLowerCase().split('@');
+  if (domain !== 'gmail.com') return null;
+  // Remove dots and everything after + in the local part
+  // test.one+spam@gmail.com -> testone
+  const normalized = local.replace(/\./g, '').split('+')[0];
+  return normalized;
+};
+
 export const handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -14,11 +24,16 @@ export const handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: "Missing user ID or email" }) };
     }
 
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail) {
+      return { statusCode: 400, body: JSON.stringify({ error: "Only Gmail addresses are allowed" }) };
+    }
+
+    // Upsert user into the users table
     try {
-      // Upsert user into the users table (resolves conflicts on existing ID)
       await sql`
         INSERT INTO navalbattle.users (id, email, name, last_played)
-        VALUES (${id}, ${email}, ${name || 'Unknown Soldier'}, CURRENT_TIMESTAMP)
+        VALUES (${id}, ${normalizedEmail}, ${name || normalizedEmail}, CURRENT_TIMESTAMP)
         ON CONFLICT (id) 
         DO UPDATE SET 
           last_played = CURRENT_TIMESTAMP,
@@ -31,8 +46,8 @@ export const handler = async (event) => {
         // In this case, we update the existing row to use their fresh ID.
         await sql`
           UPDATE navalbattle.users
-          SET id = ${id}, last_played = CURRENT_TIMESTAMP, name = ${name || 'Unknown Soldier'}
-          WHERE email = ${email}
+          SET id = ${id}, last_played = CURRENT_TIMESTAMP, name = ${name || normalizedEmail}
+          WHERE email = ${normalizedEmail}
         `;
       } else {
         throw insertError;

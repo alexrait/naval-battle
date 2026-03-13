@@ -1,6 +1,16 @@
 import { neon } from "@netlify/neon";
 import Pusher from "pusher";
 
+const normalizeEmail = (email) => {
+  if (!email) return null;
+  const [local, domain] = email.toLowerCase().split('@');
+  if (domain !== 'gmail.com') return null;
+  // Remove dots and everything after + in the local part
+  // test.one+spam@gmail.com -> testone
+  const normalized = local.replace(/\./g, '').split('+')[0];
+  return normalized;
+};
+
 export const handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -19,29 +29,32 @@ export const handler = async (event) => {
   try {
     const { targetEmail, senderName, senderId } = JSON.parse(event.body);
 
-    let normalizedTarget = targetEmail.trim().toLowerCase();
-    normalizedTarget = normalizedTarget.split('@')[0];
-    normalizedTarget = normalizedTarget.split('+')[0];
-    normalizedTarget = normalizedTarget.replace(/\./g, '');
-
-    if (!normalizedTarget || !senderId) {
+    if (!targetEmail || !senderId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing valid targetEmail or senderId" }),
+        body: JSON.stringify({ error: "Missing targetEmail or senderId" }),
       };
     }
 
-    // Look up target user by comparing the normalized name part of their email
+    const normalizedTarget = normalizeEmail(targetEmail);
+    if (!normalizedTarget) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Only Gmail addresses are allowed" }),
+      };
+    }
+
+    // Look up target user by normalized email (username only, stored in DB)
     const users = await sql`
       SELECT id, email, name FROM navalbattle.users 
-      WHERE REPLACE(SPLIT_PART(SPLIT_PART(LOWER(email), '@', 1), '+', 1), '.', '') = ${normalizedTarget} 
+      WHERE email = ${normalizedTarget}
       LIMIT 1
     `;
 
     if (users.length === 0) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: "User not found" }),
+        body: JSON.stringify({ error: "User not found. Make sure they have logged in first." }),
       };
     }
 
