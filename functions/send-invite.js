@@ -3,8 +3,12 @@ import Pusher from "pusher";
 
 const normalizeEmail = (email) => {
   if (!email) return null;
-  const [local, domain] = email.toLowerCase().split('@');
-  if (domain !== 'gmail.com') return null;
+  const parts = email.toLowerCase().trim().split('@');
+  const local = parts[0];
+  const domain = parts[1];
+
+  if (domain && domain !== 'gmail.com') return null;
+
   // Remove dots and everything after + in the local part
   // test.one+spam@gmail.com -> testone
   const normalized = local.replace(/\./g, '').split('+')[0];
@@ -28,8 +32,10 @@ export const handler = async (event) => {
 
   try {
     const { targetEmail, senderName, senderId } = JSON.parse(event.body);
+    console.log("Invite request received:", { targetEmail, senderName, senderId });
 
     if (!targetEmail || !senderId) {
+      console.log("Validation failed: Missing targetEmail or senderId");
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Missing targetEmail or senderId" }),
@@ -37,7 +43,10 @@ export const handler = async (event) => {
     }
 
     const normalizedTarget = normalizeEmail(targetEmail);
+    console.log("Normalized target email:", normalizedTarget);
+
     if (!normalizedTarget) {
+      console.log("Validation failed: Invalid or non-Gmail address", targetEmail);
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Only Gmail addresses are allowed" }),
@@ -50,8 +59,10 @@ export const handler = async (event) => {
       WHERE email = ${normalizedTarget}
       LIMIT 1
     `;
+    console.log("DB lookup result count:", users.length);
 
     if (users.length === 0) {
+      console.log("User not found in DB for normalized email:", normalizedTarget);
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "User not found. Make sure they have logged in first." }),
@@ -59,6 +70,7 @@ export const handler = async (event) => {
     }
 
     const targetUser = users[0];
+    console.log("Target user found:", targetUser);
 
     // Create a pending game record
     const games = await sql`

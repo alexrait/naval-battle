@@ -75,7 +75,9 @@ const GameContent = () => {
       showToast(t("inviteSent"));
       setTargetEmail("");
     } else {
-      showToast(t("userNotFound"), "error");
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.error || t("userNotFound");
+      showToast(errorMessage, "error");
     }
   };
 

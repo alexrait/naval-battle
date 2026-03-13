@@ -18,8 +18,10 @@ export const handler = async (event) => {
 
   try {
     const { gameId, senderId, accepted, responderName } = JSON.parse(event.body);
+    console.log("Respond invite request received:", { gameId, senderId, accepted, responderName });
 
     if (!gameId || !senderId) {
+      console.log("Validation failed: Missing gameId or senderId");
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Missing gameId or senderId" }),
@@ -27,11 +29,13 @@ export const handler = async (event) => {
     }
 
     if (accepted) {
+      console.log(`Accepting invite for game ${gameId}...`);
       // Update game status to 'playing'
       await sql`
         UPDATE navalbattle.games SET status = 'playing' WHERE id = ${gameId}
       `;
     } else {
+      console.log(`Declining invite for game ${gameId}...`);
       // Delete the pending game
       await sql`
         DELETE FROM navalbattle.games WHERE id = ${gameId} AND status = 'pending'
@@ -39,12 +43,14 @@ export const handler = async (event) => {
     }
 
     // Notify the original sender via Pusher
+    console.log(`Triggering Pusher event for user-${senderId}...`);
     await pusher.trigger(`user-${senderId}`, "invite-response", {
       type: "invite-response",
       gameId,
       accepted,
       responderName: responderName || "Unknown Commander",
     });
+    console.log("Pusher event triggered successfully");
 
     return {
       statusCode: 200,
