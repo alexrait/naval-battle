@@ -46,7 +46,14 @@ export const handler = async (event) => {
     const normalizedEmail = normalizeEmail(email);
     console.log("SYNC-USER: Normalized", { normalizedEmail });
 
-    const sql = neon();
+    // Explicitly check for the database URL and provide a helpful error if it's missing
+    const databaseUrl = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      console.error("SYNC-USER: Missing DATABASE_URL environment variable");
+      throw new Error("Missing DATABASE_URL environment variable. Please check Netlify settings.");
+    }
+
+    const sql = neon(databaseUrl);
     
     // Upsert user into the users table
     try {
