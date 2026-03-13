@@ -6,12 +6,15 @@ const normalizeEmail = (email) => {
   const local = parts[0];
   const domain = parts[1];
 
-  if (domain && domain !== 'gmail.com') return null;
+  if (!domain) return null;
 
-  // Remove dots and everything after + in the local part
-  // test.one+spam@gmail.com -> testone
-  const normalized = local.replace(/\./g, '').split('+')[0];
-  return normalized;
+  // Gmail-specific normalization (only if it's actually gmail)
+  if (domain === 'gmail.com') {
+    const normalizedLocal = local.replace(/\./g, '').split('+')[0];
+    return `${normalizedLocal}@${domain}`;
+  }
+
+  return `${local}@${domain}`;
 };
 
 export const handler = async (event) => {
@@ -19,10 +22,20 @@ export const handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const sql = neon();
+  let sql;
+  try {
+    sql = neon();
+  } catch (setupError) {
+    console.error("Neon setup error:", setupError);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Database connection setup failed. Check environment variables." }),
+    };
+  }
   
   try {
-    const { id, email, name } = JSON.parse(event.body);
+    const body = JSON.parse(event.body || "{}");
+    const { id, email, name } = body;
     console.log("Sync user request received:", { id, email, name });
 
     if (!id || !email) {
@@ -34,8 +47,8 @@ export const handler = async (event) => {
     console.log("Normalized sync email:", normalizedEmail);
 
     if (!normalizedEmail) {
-      console.log("Validation failed: Only Gmail addresses are allowed", email);
-      return { statusCode: 400, body: JSON.stringify({ error: "Only Gmail addresses are allowed" }) };
+      console.log("Validation failed: Invalid email format", email);
+      return { statusCode: 400, body: JSON.stringify({ error: "Invalid email format" }) };
     }
 
     // Upsert user into the users table
@@ -52,10 +65,9 @@ export const handler = async (event) => {
       `;
       console.log("User upserted successfully");
     } catch (insertError) {
+      // Check for email uniqueness conflict if ID is different
       if (insertError.message && insertError.message.includes('unique constraint "users_email_key"')) {
         console.log("Unique constraint hit for email, updating existing record with new ID");
-        // If a user was deleted & recreated in Netlify, they hold a new ID but the same email.
-        // In this case, we update the existing row to use their fresh ID.
         await sql`
           UPDATE navalbattle.users
           SET id = ${id}, last_played = CURRENT_TIMESTAMP, name = ${name || normalizedEmail}
@@ -71,14 +83,22 @@ export const handler = async (event) => {
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "User synced successfully" }),
+      body: JSON.stringify({ message: "User synced successfully", user: { id, email: normalizedEmail } }),
     };
   } catch (error) {
-    console.error("Sync user error:", error);
+    console.error("CRITICAL SYNC ERROR:", {
+      message: error.message,
+      stack: error.stack,
+      requestBody: event.body
+    });
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ 
+        error: "Internal Server Error during sync", 
+        details: error.message,
+        hint: "Check database constraints or network connectivity"
+      }),
     };
   }
 };

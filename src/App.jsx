@@ -38,7 +38,8 @@ const GameContent = () => {
             })
           });
           if (!response.ok) {
-            console.warn(`User sync responded with status: ${response.status}`);
+            const errorText = await response.text();
+            console.warn(`User sync failed (${response.status}):`, errorText);
           }
         } catch (err) {
           console.error("Sync user fetch failed", err);

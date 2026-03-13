@@ -7,12 +7,15 @@ const normalizeEmail = (email) => {
   const local = parts[0];
   const domain = parts[1];
 
-  if (domain && domain !== 'gmail.com') return null;
+  if (!domain) return null;
 
-  // Remove dots and everything after + in the local part
-  // test.one+spam@gmail.com -> testone
-  const normalized = local.replace(/\./g, '').split('+')[0];
-  return normalized;
+  // Gmail-specific normalization (only if it's actually gmail)
+  if (domain === 'gmail.com') {
+    const normalizedLocal = local.replace(/\./g, '').split('+')[0];
+    return `${normalizedLocal}@${domain}`;
+  }
+
+  return `${local}@${domain}`;
 };
 
 export const handler = async (event) => {
