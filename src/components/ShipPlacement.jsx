@@ -81,7 +81,7 @@ export const ShipPlacement = ({ onComplete }) => {
             <RotateCw className={cn("transition-transform duration-300", orientation === "vertical" ? "rotate-90" : "")} size={14} />
             {orientation === "horizontal" ? t("h_short") : t("v_short")}
           </Button>
-          <Button variant="outline" size="sm" onClick={randomize} className="flex gap-1.5">
+          <Button variant="white" size="sm" onClick={randomize} className="flex gap-1.5">
             <Shuffle size={14} /> {t("randomize")}
           </Button>
           <Button variant="outline" size="sm" onClick={reset} className="text-slate-600">{t("reset")}</Button>
@@ -140,7 +140,7 @@ export const ShipPlacement = ({ onComplete }) => {
 
           <div className="pt-4 flex flex-col gap-3">
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" size="sm" onClick={randomize} className="flex gap-2">
+              <Button variant="white" size="sm" onClick={randomize} className="flex gap-2">
                 <Shuffle size={14} /> {t("randomize")}
               </Button>
               <Button variant="outline" size="sm" onClick={reset} className="flex gap-2 text-slate-600">

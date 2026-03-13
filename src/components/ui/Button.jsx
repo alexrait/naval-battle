@@ -12,7 +12,8 @@ const Button = React.forwardRef(({ className, variant = "default", size = "defau
     secondary: "bg-slate-800 text-slate-100 hover:bg-slate-700 border border-slate-700",
     ghost: "hover:bg-slate-800/50 hover:text-white text-slate-400",
     link: "text-yellow-500 underline-offset-4 hover:underline",
-    blue: "bg-blue-700 text-white hover:bg-blue-600 shadow-lg shadow-blue-900/20"
+    blue: "bg-blue-700 text-white hover:bg-blue-600 shadow-lg shadow-blue-900/20",
+    white: "bg-white text-slate-950 hover:bg-slate-100 font-black uppercase tracking-widest shadow-lg"
   }
 
   const sizes = {
