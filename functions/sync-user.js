@@ -1,14 +1,16 @@
 import { neon } from "@netlify/neon";
 
+console.log("SYNC-USER: Module Loaded");
+
 const normalizeEmail = (email) => {
   if (!email) return null;
   const parts = email.toLowerCase().trim().split('@');
+  if (parts.length !== 2) return email.toLowerCase().trim();
+  
   const local = parts[0];
   const domain = parts[1];
 
-  if (!domain) return null;
-
-  // Gmail-specific normalization (only if it's actually gmail)
+  // Gmail-specific normalization
   if (domain === 'gmail.com') {
     const normalizedLocal = local.replace(/\./g, '').split('+')[0];
     return `${normalizedLocal}@${domain}`;
@@ -18,42 +20,37 @@ const normalizeEmail = (email) => {
 };
 
 export const handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
+  console.log("SYNC-USER: Start", { method: event.httpMethod });
 
-  let sql;
-  try {
-    sql = neon();
-  } catch (setupError) {
-    console.error("Neon setup error:", setupError);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Database connection setup failed. Check environment variables." }),
+  if (event.httpMethod !== "POST") {
+    return { 
+      statusCode: 405, 
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method Not Allowed" }) 
     };
   }
-  
+
   try {
     const body = JSON.parse(event.body || "{}");
     const { id, email, name } = body;
-    console.log("Sync user request received:", { id, email, name });
+    console.log("SYNC-USER: Input received", { id, email, name });
 
     if (!id || !email) {
-      console.log("Validation failed: Missing user ID or email");
-      return { statusCode: 400, body: JSON.stringify({ error: "Missing user ID or email" }) };
+      return { 
+        statusCode: 400, 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Missing user ID or email" }) 
+      };
     }
 
     const normalizedEmail = normalizeEmail(email);
-    console.log("Normalized sync email:", normalizedEmail);
+    console.log("SYNC-USER: Normalized", { normalizedEmail });
 
-    if (!normalizedEmail) {
-      console.log("Validation failed: Invalid email format", email);
-      return { statusCode: 400, body: JSON.stringify({ error: "Invalid email format" }) };
-    }
-
+    const sql = neon();
+    
     // Upsert user into the users table
     try {
-      console.log("Upserting user into DB...");
+      console.log("SYNC-USER: Attempting UPSERT by ID...");
       await sql`
         INSERT INTO navalbattle.users (id, email, name, last_played)
         VALUES (${id}, ${normalizedEmail}, ${name || normalizedEmail}, CURRENT_TIMESTAMP)
@@ -63,19 +60,19 @@ export const handler = async (event) => {
           email = EXCLUDED.email,
           name = EXCLUDED.name
       `;
-      console.log("User upserted successfully");
+      console.log("SYNC-USER: Upsert successful");
     } catch (insertError) {
-      // Check for email uniqueness conflict if ID is different
-      if (insertError.message && insertError.message.includes('unique constraint "users_email_key"')) {
-        console.log("Unique constraint hit for email, updating existing record with new ID");
+      const msg = insertError.message || "";
+      if (msg.includes('unique constraint "users_email_key"')) {
+        console.log("SYNC-USER: Email conflict detected, attempting UPDATE by email...");
         await sql`
           UPDATE navalbattle.users
           SET id = ${id}, last_played = CURRENT_TIMESTAMP, name = ${name || normalizedEmail}
           WHERE email = ${normalizedEmail}
         `;
-        console.log("User updated successfully via email match");
+        console.log("SYNC-USER: Update by email successful");
       } else {
-        console.error("Database error during sync:", insertError);
+        console.error("SYNC-USER: Database error", insertError);
         throw insertError;
       }
     }
@@ -83,21 +80,17 @@ export const handler = async (event) => {
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "User synced successfully", user: { id, email: normalizedEmail } }),
+      body: JSON.stringify({ message: "User synced successfully" }),
     };
   } catch (error) {
-    console.error("CRITICAL SYNC ERROR:", {
-      message: error.message,
-      stack: error.stack,
-      requestBody: event.body
-    });
+    console.error("SYNC-USER: Final Catch", error);
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        error: "Internal Server Error during sync", 
-        details: error.message,
-        hint: "Check database constraints or network connectivity"
+        error: "Internal Server Error", 
+        message: error.message,
+        id: event.headers?.["x-nf-request-id"]
       }),
     };
   }

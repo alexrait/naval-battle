@@ -28,14 +28,16 @@ const GameContent = () => {
     if (user?.id && user?.email) {
       const syncUser = async () => {
         try {
+          const payload = { 
+            id: user.id, 
+            email: user.email, 
+            name: user.user_metadata?.full_name || t("unknownSoldier")
+          };
+          console.log("Syncing user with payload:", payload);
           const response = await fetch("/.netlify/functions/sync-user", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              id: user.id, 
-              email: user.email, 
-              name: user.user_metadata?.full_name || t("unknownSoldier")
-            })
+            body: JSON.stringify(payload)
           });
           if (!response.ok) {
             const errorText = await response.text();
