@@ -49,17 +49,28 @@ export const handler = async (event) => {
     console.log("Normalized target email:", normalizedTarget);
 
     if (!normalizedTarget) {
-      console.log("Validation failed: Invalid or non-Gmail address", targetEmail);
+      console.log("Validation failed: Invalid email format", targetEmail);
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Only Gmail addresses are allowed" }),
+        body: JSON.stringify({ error: "Invalid email format" }),
       };
     }
 
-    // Look up target user by normalized email (username only, stored in DB)
+    const databaseUrl = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      console.error("SEND-INVITE: Missing DATABASE_URL");
+      return { statusCode: 500, body: JSON.stringify({ error: "Database configuration error" }) };
+    }
+
+    const sql = neon(databaseUrl);
+
+    // Look up target user by normalized email OR by just the username part
+    const targetUsername = normalizedTarget.split('@')[0];
+
     const users = await sql`
       SELECT id, email, name FROM navalbattle.users 
-      WHERE email = ${normalizedTarget}
+      WHERE email = ${normalizedTarget} 
+         OR email LIKE ${targetUsername + '@%'}
       LIMIT 1
     `;
     console.log("DB lookup result count:", users.length);
