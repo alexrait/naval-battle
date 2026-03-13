@@ -35,12 +35,15 @@ export const Grid = ({
             
             {/* Cells */}
             {Array.from({ length: GRID_SIZE }).map((_, colIndex) => {
-              const cell = cells.find(c => c.x === colIndex && c.y === rowIndex);
-              const isHit     = cell?.status === "hit";
-              const isSunk    = cell?.status === "sunk";
-              const isMiss    = cell?.status === "miss";
-              const isBlocked = cell?.status === "blocked";
-              const hasShip   = cell?.shipId && showShips;
+              const relevantCells = cells.filter(c => c.x === colIndex && c.y === rowIndex);
+              const cellWithStatus = relevantCells.find(c => c.status);
+              const cellWithShip = relevantCells.find(c => c.shipId);
+
+              const isHit     = cellWithStatus?.status === "hit";
+              const isSunk    = cellWithStatus?.status === "sunk";
+              const isMiss    = cellWithStatus?.status === "miss";
+              const isBlocked = cellWithStatus?.status === "blocked";
+              const hasShip   = cellWithShip && showShips;
               const isMarked  = isHit || isSunk;
 
               return (
