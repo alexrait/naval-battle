@@ -53,20 +53,28 @@ export const handler = async (event) => {
     // Normalize the input: if it's an email, normalize it. If not, treat as username.
     const input = targetEmail.toLowerCase().trim();
     const isEmail = input.includes('@');
-    const normalizedTarget = isEmail ? normalizeEmail(input) : input;
     
-    // Get the username part and a "clean" version (no dots) for Gmail compatibility
-    const targetUsername = normalizedTarget.split('@')[0];
-    const cleanUsername = targetUsername.replace(/\./g, '');
+    let normalizedTarget;
+    if (isEmail) {
+      normalizedTarget = normalizeEmail(input);
+    } else {
+      // Treat as username part - apply same cleaning logic (no dots, no plus)
+      normalizedTarget = input.replace(/\./g, '').split('+')[0];
+    }
+    
+    // The username part we search for in the database
+    const searchUsername = normalizedTarget.split('@')[0];
 
-    console.log("Searching for target:", { normalizedTarget, targetUsername, cleanUsername });
+    console.log("Searching for target:", { input, normalizedTarget, searchUsername });
 
-    // Look up target user by full email OR by various username patterns
+    // Look up target user by full email OR by username part
+    // We look for:
+    // 1. Exact email match
+    // 2. Email starting with the cleaned username (handles gmail dot/plus aliases)
     const users = await sql`
       SELECT id, email, name FROM navalbattle.users 
       WHERE email = ${normalizedTarget} 
-         OR email LIKE ${targetUsername + '@%'}
-         OR email LIKE ${cleanUsername + '@%'}
+         OR email LIKE ${searchUsername + '@%'}
       LIMIT 1
     `;
     console.log("DB lookup result count:", users.length);
