@@ -6,7 +6,7 @@ import { Input } from "./components/ui/Input";
 import { ShipPlacement } from "./components/ShipPlacement";
 import { useAuth } from "./hooks/useAuth";
 import { useRealtime } from "./hooks/useRealtime";
-import { Mail, Bell, Anchor, Shield, Target, Play } from "lucide-react";
+import { Mail, Bell, Anchor, Shield, Target, Play, X, Clock } from "lucide-react";
 import { cn } from "./lib/utils";
 
 const GameContent = () => {
@@ -18,6 +18,25 @@ const GameContent = () => {
   const [targetEmail, setTargetEmail] = useState("");
   const [currentGameId, setCurrentGameId] = useState(null);
   const [toast, setToast] = useState(null); // { message, type: 'success'|'error' }
+  const [recentInvites, setRecentInvites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("recentInvites") || "[]");
+    } catch { return []; }
+  });
+
+  const saveRecentInvite = (email) => {
+    const normalized = email.trim().toLowerCase();
+    if (!normalized) return;
+    const updated = [normalized, ...recentInvites.filter(e => e !== normalized)].slice(0, 5);
+    setRecentInvites(updated);
+    localStorage.setItem("recentInvites", JSON.stringify(updated));
+  };
+
+  const removeRecentInvite = (email) => {
+    const updated = recentInvites.filter(e => e !== email);
+    setRecentInvites(updated);
+    localStorage.setItem("recentInvites", JSON.stringify(updated));
+  };
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -75,6 +94,7 @@ const GameContent = () => {
       })
     });
     if (res.ok) {
+      saveRecentInvite(targetEmail);
       showToast(t("inviteSent"));
       setTargetEmail("");
     } else {
@@ -270,13 +290,39 @@ const GameContent = () => {
                     onChange={(e) => setTargetEmail(e.target.value)}
                   />
                 </div>
-                <Button 
-                  onClick={sendInvite} 
+                <Button
+                  onClick={sendInvite}
                   className="w-full h-16 rounded-2xl text-lg relative overflow-hidden group shadow-2xl"
                 >
                   <span className="relative z-10">{t("send")}</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Button>
+
+                {recentInvites.length > 0 && (
+                  <div className="w-full space-y-3 pt-2">
+                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
+                      <Clock size={12} />
+                      <span>{t("recentInvites")}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {recentInvites.map((email) => (
+                        <div
+                          key={email}
+                          className="group/chip flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold tactical-font text-slate-300 hover:border-yellow-500/40 hover:text-yellow-400 transition-all cursor-pointer"
+                          onClick={() => setTargetEmail(email)}
+                        >
+                          <span className="uppercase">{email}</span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); removeRecentInvite(email); }}
+                            className="ml-1 p-0.5 rounded-md text-slate-600 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-4 text-slate-500 font-bold text-[10px] tracking-[0.3em] uppercase">
                 <Shield size={14} />
