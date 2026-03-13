@@ -23,36 +23,14 @@ export const handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const sql = neon();
-
-  const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID,
-    key: process.env.PUSHER_KEY,
-    secret: process.env.PUSHER_SECRET,
-    cluster: process.env.PUSHER_CLUSTER,
-    useTLS: true,
-  });
-
   try {
     const { targetEmail, senderName, senderId } = JSON.parse(event.body);
     console.log("Invite request received:", { targetEmail, senderName, senderId });
 
     if (!targetEmail || !senderId) {
-      console.log("Validation failed: Missing targetEmail or senderId");
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Missing targetEmail or senderId" }),
-      };
-    }
-
-    const normalizedTarget = normalizeEmail(targetEmail);
-    console.log("Normalized target email:", normalizedTarget);
-
-    if (!normalizedTarget) {
-      console.log("Validation failed: Invalid email format", targetEmail);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Invalid email format" }),
       };
     }
 
@@ -63,10 +41,24 @@ export const handler = async (event) => {
     }
 
     const sql = neon(databaseUrl);
+    
+    const pusher = new Pusher({
+      appId: process.env.PUSHER_APP_ID,
+      key: process.env.PUSHER_KEY,
+      secret: process.env.PUSHER_SECRET,
+      cluster: process.env.PUSHER_CLUSTER,
+      useTLS: true,
+    });
 
-    // Look up target user by normalized email OR by just the username part
+    // Normalize the input: if it's an email, normalize it. If not, treat as username.
+    const input = targetEmail.toLowerCase().trim();
+    const isEmail = input.includes('@');
+    const normalizedTarget = isEmail ? normalizeEmail(input) : input;
     const targetUsername = normalizedTarget.split('@')[0];
 
+    console.log("Searching for target:", { normalizedTarget, targetUsername });
+
+    // Look up target user by full email OR by just the username part
     const users = await sql`
       SELECT id, email, name FROM navalbattle.users 
       WHERE email = ${normalizedTarget} 
