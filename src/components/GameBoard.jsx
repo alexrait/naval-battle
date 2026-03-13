@@ -39,30 +39,28 @@ export const GameBoard = ({ initialShips, gameId, user }) => {
   const playerCellsRef = useRef([]);
   useEffect(() => { playerCellsRef.current = playerCells; }, [playerCells]);
 
-  // Defender: check if this hit completes a ship
-  const getSunkShip = (ships, hitCells) => ships.find(ship =>
-    ship.cells.every(c =>
-      hitCells.some(h => h.x === c.x && h.y === c.y && h.status !== "miss")
-    )
-  ) || null;
-
   const handleIncomingFire = async (x, y) => {
-    const hit = playerShipsRef.current.some(s => s.cells.some(c => c.x === x && c.y === y));
+    const hitShip = playerShipsRef.current.find(s => s.cells.some(c => c.x === x && c.y === y));
+    const hit = !!hitShip;
     const newHit = { x, y, status: hit ? "hit" : "miss" };
     const currentHits = [...playerCellsRef.current, newHit];
 
     let sunkCells = null;
     const keepTurn = hit;
 
-    if (hit) {
-      const sunkShip = getSunkShip(playerShipsRef.current, currentHits);
-      if (sunkShip) {
-        sunkCells = sunkShip.cells;
+    if (hitShip) {
+      // Check if this specific ship is now fully hit
+      const isSunk = hitShip.cells.every(c =>
+        currentHits.some(h => h.x === c.x && h.y === c.y && h.status !== "miss")
+      );
+
+      if (isSunk) {
+        sunkCells = hitShip.cells;
         // Upgrade all sunk ship cells to "sunk" on my board
         setPlayerCells(prev => {
           const withNew = prev.some(c => c.x === x && c.y === y) ? prev : [...prev, newHit];
           return withNew.map(c =>
-            sunkShip.cells.some(sc => sc.x === c.x && sc.y === c.y) ? { ...c, status: "sunk" } : c
+            hitShip.cells.some(sc => sc.x === c.x && sc.y === c.y) ? { ...c, status: "sunk" } : c
           );
         });
         playKill();
