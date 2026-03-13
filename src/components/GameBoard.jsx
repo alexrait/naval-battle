@@ -73,6 +73,10 @@ export const GameBoard = ({ initialShips, gameId, user }) => {
       playMiss();
     }
 
+    // Check if all my ships have been sunk (I lost)
+    const totalHitsOnMe = currentHits.filter(c => c.status === "hit" || c.status === "sunk").length;
+    if (totalHitsOnMe >= TOTAL_SHIP_CELLS) setWinner("opponent");
+
     await fetch("/.netlify/functions/report-result", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

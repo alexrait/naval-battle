@@ -57,7 +57,7 @@ const translations = {
     miss: "החטאה",
     hit: "פגיעה!",
     sink: "טביעה!",
-    win: "ניצחון!",
+    win: "ניצחת!",
     loss: "הפסד",
     ships: "ספינות",
     turn: "תורך",
