@@ -54,15 +54,19 @@ export const handler = async (event) => {
     const input = targetEmail.toLowerCase().trim();
     const isEmail = input.includes('@');
     const normalizedTarget = isEmail ? normalizeEmail(input) : input;
+    
+    // Get the username part and a "clean" version (no dots) for Gmail compatibility
     const targetUsername = normalizedTarget.split('@')[0];
+    const cleanUsername = targetUsername.replace(/\./g, '');
 
-    console.log("Searching for target:", { normalizedTarget, targetUsername });
+    console.log("Searching for target:", { normalizedTarget, targetUsername, cleanUsername });
 
-    // Look up target user by full email OR by just the username part
+    // Look up target user by full email OR by various username patterns
     const users = await sql`
       SELECT id, email, name FROM navalbattle.users 
       WHERE email = ${normalizedTarget} 
          OR email LIKE ${targetUsername + '@%'}
+         OR email LIKE ${cleanUsername + '@%'}
       LIMIT 1
     `;
     console.log("DB lookup result count:", users.length);
